@@ -18,8 +18,10 @@
         <maven.compiler.target>1.7</maven.compiler.target>
 
         <com.h2database.version>1.4.200</com.h2database.version>
+        <org.eclipse.jetty.version>9.4.24.v20191120</org.eclipse.jetty.version>
         <org.slf4j.version>1.7.21</org.slf4j.version>
         <org.springframework.version>3.2.8.RELEASE</org.springframework.version>
+        <org.springframework.integration.version>3.0.8.RELEASE</org.springframework.integration.version>
     </properties>
 
     <dependencies>
@@ -35,14 +37,19 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-instrument</artifactId>
+            <artifactId>spring-webmvc</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-instrument-tomcat</artifactId>
+            <artifactId>spring-instrument</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
+        <!--        <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-instrument-tomcat</artifactId>
+                    <version>${org.springframework.version}</version>
+                </dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
@@ -76,10 +83,19 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-core</artifactId>
+            <version>${org.springframework.integration.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-event</artifactId>
+            <version>${org.springframework.integration.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-feed</artifactId>
+            <version>${org.springframework.integration.version}</version>
         </dependency>
 
         <dependency>
@@ -93,6 +109,47 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${org.slf4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-maven-plugin</artifactId>
+                    <version>${org.eclipse.jetty.version}</version>
+                    <configuration>
+                        <systemProperties>
+                            <systemProperty>
+                                <name>jetty.http.port</name>
+                                <value>9000</value>
+                            </systemProperty>
+                        </systemProperties>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
