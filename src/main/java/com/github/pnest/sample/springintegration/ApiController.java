@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 class ApiController {
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
-    ResponseEntity<Void> getStatus() {
-        return new ResponseEntity<>(HttpStatus.OK);
+    ResponseEntity<String> getStatus() {
+        return new ResponseEntity<>("Simple body", HttpStatus.OK);
     }
 }

@@ -1,10 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                           http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+                           http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
 
-    <bean class="com.github.pnest.sample.springintegration.LoggingBean"/>
+    <bean id="loggingBean" class="com.github.pnest.sample.springintegration.LoggingBean"/>
 
     <bean class="com.github.pnest.sample.springintegration.ApiController"/>
+    <bean class="com.github.pnest.sample.springintegration.ApiAsyncController">
+        <property name="queueChannel" ref="queueChannel"/>
+    </bean>
+
+    <mvc:annotation-driven>
+        <mvc:async-support default-timeout="100"/>
+    </mvc:annotation-driven>
+
+    <aop:config proxy-target-class="true"/>
+
+    <!-- Spring Integration -->
+
+    <!-- point-to-point channel -->
+    <int:channel id="queueChannel">
+        <int:queue message-store="messageStore"/>
+    </int:channel>
+
+    <int:channel id="responsesChannel">
+        <int:queue message-store="messageStore"/>
+    </int:channel>
+
+    <int-jdbc:message-store id="messageStore" data-source="mainDataSource"/>
+
+    <!--<int:outbound-channel-adapter channel="queueChannel" ref="loggingBean" method="logMessage"/>-->
+
+    <!--    <int:inbound-channel-adapter channel="queueChannel" ref="loggingBean" method="logMessage">
+            <int:poller max-messages-per-poll="1" fixed-rate="1000"/>
+        </int:inbound-channel-adapter>-->
+
+    <int-http:inbound-channel-adapter id="httpChannelAdapter" channel="queueChannel" supported-methods="GET"
+                                      path="/api/async/{value}"
+                                      mapped-request-headers=""
+                                      payload-expression="#pathVariables.value">
+    </int-http:inbound-channel-adapter>
+
+    <int-http:inbound-gateway id="inboundController"
+                              request-channel="queueChannel" reply-channel="responsesChannel"
+                              path="/api/si/{value}" payload-expression="#pathVariables.value" supported-methods="GET">
+        <!--        <int-http:request-mapping headers="User-Agent"/>-->
+    </int-http:inbound-gateway>
+
+    <int:service-activator input-channel="queueChannel" ref="loggingBean" method="logMessage">
+        <int:poller max-messages-per-poll="1" fixed-rate="1000"/>
+    </int:service-activator>
 
 </beans>
