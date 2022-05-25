@@ -20,7 +20,7 @@
         <com.h2database.version>1.4.196</com.h2database.version>
         <org.eclipse.jetty.version>9.4.24.v20191120</org.eclipse.jetty.version>
         <org.slf4j.version>1.7.21</org.slf4j.version>
-        <org.springframework.version>3.2.8.RELEASE</org.springframework.version>
+        <org.springframework.version>5.2.22.RELEASE</org.springframework.version>
         <org.springframework.integration.version>3.0.8.RELEASE</org.springframework.integration.version>
     </properties>
 
